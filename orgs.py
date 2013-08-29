@@ -1,0 +1,4 @@
+organizations = [
+    "dev",
+    "infrastructure",
+]
