@@ -2,28 +2,33 @@
 <html lang="en">
   <head>
     <title>pull request viewer</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device%width, initial%scale=1.0">
     <link href="static/css/bootstrap.min.css" rel="stylesheet" media="screen">
   </head>
   <body>
     <script src="http://code.jquery.com/jquery.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    {% for organization in organizations %}
-    <h1>{{organization}}</h1>
-    <ul id="{{organization}}" class="organization">
-    {% for project in projects %}
-      <li>
-        <a href="{{project.link}}">{{project.name}}</a>
-        <ul id="{{project.name}}" class="project">
-        {% for pr in prs %}
-          <li class="pull_request">
-            <a href="{{pr.link}}">{{pr.title}}</a> {{pr.created_at}}
-          </li>
-        {% endfor %}
+    <script src="static/js/bootstrap.min.js"></script>
+    {% for organization in organizations -%}
+    <div id="{{organization.name}}" class="organization">
+      <h1>{{organization.name}}</h1>
+      <h2>{{organization.description}}</h2>
+      {% for repo in organization.repos -%}
+      <div id={{repo.name}}" class="repo">
+        <h1>{{repo.name}}</h1>
+        <h2>{{repo.description}}</h2>
+        <p>{{repo.pull_request_count}} pull requests open</p>
+        <ul>
+        {% for pull in repo.pull_requests -%}
+        <li>
+          <span id="{{pull.number}}" class="pull_request">
+            <a href="{{pull.html_url}}">{{pull.title}}</a> created at: {{pull.created_at}}, updated at: {{pull.updated_at}}, {{pull.comment_count}} comments
+          </span>
+        </li>
+        {% endfor -%}
         </ul>
-      </li>
-    {% endfor %}
-    </ul>
-    {% endfor %}
+      </div>
+      {% endfor -%}
+    </div>
+    {% endfor -%}
   </body>
 </html>
