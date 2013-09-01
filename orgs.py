@@ -1,4 +1,0 @@
-organizations = [
-    "dev",
-    "infrastructure",
-]
