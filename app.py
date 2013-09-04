@@ -34,12 +34,6 @@ def index():
         fetched_at=orgs['fetched_at']
     )
 
-def index():
-    return render_template(
-        'index.html',
-        orgs=build_page_data(config.organization_names)
-    )
-
 def build_page_data(organization_names):
     orgs = []
     for name in organization_names:
