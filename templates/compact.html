@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block body %}
+    <script src="static/js/masonry.pkgd.min.js"></script>
+    <script>
+      $(function(){
+        var container = document.querySelector('#container');
+        var msnry = new Masonry(container, {
+          // options
+          columnWidth: 200,
+          itemSelector: '.repo'
+        });
+      });
+    </script>
+    {% for organization in organizations -%}
+      {% for repo in organization.repos -%}
+      {% if repo.pull_request_count > 0 %}
+      <div id="{{repo.name}}" class="panel panel-default repo">
+        <div class="panel-heading">{{repo.name}}</div>
+        <ul class="list-group">
+        {% for pull in repo.pull_requests -%}
+          <li class="list-group-item">
+            <p style="margin-bottom: 0;"><a href="{{- pull.html_url -}}" title="{{- pull.description -}}">{{pull.name}}</a></p>
+          </li>
+        {% endfor -%}
+        </ul>
+      </div>
+      {% endif %}
+      {% endfor -%}
+    {% endfor -%}
+{% endblock %}
