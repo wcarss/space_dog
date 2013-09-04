@@ -1,38 +1,19 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <title>pull request viewer</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="static/css/bootstrap.min.css" rel="stylesheet" media="screen">
-  </head>
-  <body>
-    <script src="http://code.jquery.com/jquery.js"></script>
-    <script src="static/js/bootstrap.min.js"></script>
-    <script src="static/js/moment.min.js"></script>
-    <script>
-      $(function(){
-        $('.date').each(function() {
-        var old_html = $(this).html();
-        $(this).html(moment(old_html).fromNow());
-        $(this).attr('title', moment(old_html).format("MMMM Do YYYY, h:mm:ss a"));
-        });
-      });
-    </script>
-    <div class="container">
+{% extends "base.html" %}
+{% block body %}
     {% for organization in organizations -%}
     <div id="{{organization.name}}" class="organization">
       <h2>{{organization.name}}</h2>
       {% for repo in organization.repos -%}
       {% if repo.pull_request_count > 0 %}
       <div id={{repo.name}}" class="panel panel-default repo">
-        <div class="panel-heading"><h4 style="margin-top: 8px; margin-bottom: 8px;">{{repo.name}} <small>{{repo.description}}</small></h4></div>
+        <div class="panel-heading"><h4 style="margin-top: 0px; margin-bottom: 1px;">{{repo.name}} <small>{{repo.description}}</small></h4></div>
         <ul class="list-group">
         {% for pull in repo.pull_requests -%}
-          <li class="list-group-item">
-            <img src="{{- pull.avatar_url -}}" title="{{- pull.user -}}" height=36 width=36 class="img-rounded">
-            <p style="display:inline-block"><a href="{{- pull.html_url -}}" title="{{- pull.description -}}">{{pull.name}}</a></p>
-            <p style="display:inline-block">Created <span class="date">{{- pull.created_at -}}</span>, last updated <span class="date">{{- pull.updated_at -}}</span>.</p>
-            <a href="{{pull.html_url}}"><span class="badge" title="last comment by {{ pull.user }}">{{pull.comment_count}} comment{% if pull.comment_count != 1 %}s{% endif %}</span></a>
+          <li class="list-group-item" style="padding: 4px;">
+            <img src="{{- pull.avatar_url -}}" title="{{- pull.user -}}" height=32 width=32 class="img-rounded">
+            <p style="display:inline-block; margin-bottom: 0;"><a href="{{- pull.html_url -}}" title="{{- pull.description -}}">{{pull.name}}</a></p>
+            <p style="display:inline-block; margin-bottom: 0;"> last updated <abbr class="date">{{- pull.updated_at -}}</abbr>.</p>
+            <p style="display:inline-block; margin-bottom: 0;" class="text-right"><a href="{{pull.html_url}}"><span class="badge" title="last comment by {{ pull.last_user }}">{{pull.comment_count}} comment{% if pull.comment_count != 1 %}s{% endif %}</span></a></p>
           </li>
         {% endfor -%}
         </ul>
@@ -40,8 +21,5 @@
       {% endif %}
       {% endfor -%}
     </div>
-    {% endfor -%}
-    <p>fetched <span class="date">{{fetched_at}}</span>.</p>
-    </div>
-  </body>
-</html>
+    {% endfor %}
+{% endblock %}

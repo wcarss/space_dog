@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>pull request viewer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="static/css/bootstrap.min.css" rel="stylesheet" media="screen">
+  </head>
+  <body>
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="static/js/bootstrap.min.js"></script>
+    <script src="static/js/moment.min.js"></script>
+    <script>
+      $(function(){
+        $('.date').each(function() {
+        var old_html = $(this).html();
+        $(this).html(moment(old_html).fromNow());
+        $(this).attr('title', moment(old_html).format("MMMM Do YYYY, h:mm:ss a"));
+        });
+      });
+    </script>
+    <div class="container" id="container">
+    <h1>Pull Requests</h1>
+    <p>Hey, there, looking to review some code? I got pull requests here, sorted by repo with oldest pulls in each repo at the top. The repo order is shuffled every five minutes.</p>
+    {% block body scoped %}
+    ... this is the base template, something has gone wrong!
+    {% endblock %}
+    <p>fetched <abbr class="date">{{fetched_at}}</abbr>.</p>
+    </div>
+  </body>
+</html>
+

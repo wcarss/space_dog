@@ -3,17 +3,9 @@ import requests
 import config
 from flask import Flask, render_template, jsonify
 import datetime
+import random
 
 app = Flask(__name__)
-count = 0
-
-def datetime_encoder(o):
-    if isinstance(o, datetime.datetime):
-        return o.isoformat()
-    elif isinstance(o, datetime.date):
-        return o.isoformat()
-    else:
-        raise TypeError(repr(o) + " is not JSON serializable")
 
 @app.route('/js')
 def json_orgs():
@@ -22,14 +14,24 @@ def json_orgs():
         'fetched_at': datetime.datetime.now().isoformat()
     })
 
+@app.route('/compact')
+def compact():
+    with open("orgs.js") as org_file:
+        orgs = json.load(org_file)
+    return render_template(
+        'compact.html',
+        organizations=orgs['organizations'],
+        fetched_at=orgs['fetched_at']
+    )
+
 @app.route('/')
-def fake_index():
-    with open("fake_orgs.js") as fake_org_file:
-        fake_orgs = json.load(fake_org_file)
+def index():
+    with open("orgs.js") as org_file:
+        orgs = json.load(org_file)
     return render_template(
         'index.html',
-        organizations=fake_orgs['organizations'],
-        fetched_at=fake_orgs['fetched_at']
+        organizations=orgs['organizations'],
+        fetched_at=orgs['fetched_at']
     )
 
 def index():
@@ -43,6 +45,8 @@ def build_page_data(organization_names):
     for name in organization_names:
         organization = get_organization(config.api_url + '/orgs/' + name)
         orgs.append(organization)
+
+    random.shuffle(orgs)
     return orgs
 
 def get_organization(org_url):
@@ -56,9 +60,6 @@ def get_organization(org_url):
     }
 
 def api_get(resource):
-    global count
-    count += 1
-    print "Made %s calls." % count
     response = requests.get(resource)
     #print "Requested: %s" % resource
     #print "Response headers: %s" % response.headers
@@ -71,6 +72,8 @@ def get_repos(repos_url):
     for full_repo in full_repos:
         repo = make_minimal_repo(full_repo)
         repos.append(repo)
+
+    random.shuffle(repos)
     return repos
 
 def make_minimal_repo(full_repo):
@@ -91,7 +94,7 @@ def get_pull_requests(pull_url):
         pull = make_minimal_pull(full_pull)
         pulls.append(pull)
 
-    pulls.reverse()
+    pulls.sort(key=lambda pull: pull['updated_at'])
     return pulls
 
 def make_minimal_pull(full_pull):
@@ -101,6 +104,12 @@ def make_minimal_pull(full_pull):
     default_avatar_url = "https://secure.gravatar.com/avatar/d41d8cd98f00b204e9800998ecf8427e?d=https://github.2ndsiteinc.com%2Fimages%2Fgravatars%2Fgravatar-user-420.png"
     if avatar_url == default_avatar_url:
         avatar_url = avatar_url.replace(".2ndsiteinc", "")
+
+    if comments:
+        last_user = comments[-1]['user']['login']
+    else:
+        last_user = "nobody! Review this!"
+
     return {
         'number': full_pull['number'],
         'name': full_pull['title'],
@@ -113,6 +122,7 @@ def make_minimal_pull(full_pull):
         'api_url': full_pull['url'],
         'html_url': full_pull['html_url'],
         #'comments': comments,
+        'last_user':  last_user,
         'comment_count': len(comments),
     }
 
